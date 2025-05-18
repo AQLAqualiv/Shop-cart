@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Mini Cart</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding-bottom: 80px;
+    }
+    .product {
+      border: 1px solid #ccc;
+      padding: 12px;
+      margin: 10px;
+      border-radius: 8px;
+    }
+    .cart-button {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: #0d6efd;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 18px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 999;
+    }
+    #cart-modal {
+      position: fixed;
+      bottom: 60px;
+      right: 16px;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 16px;
+      max-width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 999;
+    }
+    .cart-item {
+      border-bottom: 1px solid #eee;
+      padding: 6px 0;
+    }
+    .checkout-link {
+      display: block;
+      margin-top: 12px;
+      background: #198754;
+      color: white;
+      text-align: center;
+      padding: 8px;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="product">
+    <h3>Molly Fish</h3>
+    <p>₱50 each</p>
+    <button onclick="addToCart('Molly Fish', 50)">Add to Cart</button>
+  </div>
+
+  <div class="product">
+    <h3>Betta Fish</h3>
+    <p>₱100 each</p>
+    <button onclick="addToCart('Betta Fish', 100)">Add to Cart</button>
+  </div>
+
+  <!-- Cart modal -->
+  <div id="cart-modal"></div>
+
+  <!-- Floating cart button -->
+  <button class="cart-button" onclick="toggleCart()">🛒 Cart</button>
+
+  <script>
+    function addToCart(name, price) {
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      let index = cart.findIndex(item => item.name === name);
+      if (index > -1) {
+        cart[index].quantity += 1;
+      } else {
+        cart.push({ name, price, quantity: 1 });
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      alert(name + ' added to cart!');
+    }
+
+    function toggleCart() {
+      const modal = document.getElementById('cart-modal');
+      if (modal.style.display === 'block') {
+        modal.style.display = 'none';
+      } else {
+        updateCartView();
+        modal.style.display = 'block';
+      }
+    }
+
+    function updateCartView() {
+      const modal = document.getElementById('cart-modal');
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      if (cart.length === 0) {
+        modal.innerHTML = '<p>Your cart is empty.</p>';
+        return;
+      }
+
+      let html = '<h4>Your Cart</h4>';
+      cart.forEach(item => {
+        html += `
+          <div class="cart-item">
+            ${item.name} x${item.quantity} — ₱${item.price * item.quantity}
+          </div>`;
+      });
+
+      // Optional: Generate a Google Form link or trigger your message/chat flow
+      const message = encodeURIComponent(
+        cart.map(i => `${i.name} x${i.quantity}`).join(', ')
+      );
+      const checkoutLink = `https://m.me/390955964107360?ref=w39902721`; // Replace with your Messenger trigger
+
+      html += `<a class="checkout-link" href="${checkoutLink}" target="_blank">Checkout</a>`;
+      modal.innerHTML = html;
+    }
+  </script>
+
+</body>
+</html>
